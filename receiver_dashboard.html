@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Receiver Dashboard - FoodShare</title>
+
+    <!-- Bootstrap -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+
+<body class="bg-light">
+
+
+<!-- ================= NAVBAR ================= -->
+
+<nav class="navbar navbar-dark bg-success">
+
+    <div class="container">
+
+        <a class="navbar-brand fw-bold"
+           href="/">
+
+            🍱 FoodShare
+
+        </a>
+
+
+        <div class="text-white">
+
+            Welcome, {{ current_user.name }}
+
+
+            <a href="/receiver/requests"
+               class="btn btn-light btn-sm ms-2">
+
+                📋 My Requests
+
+            </a>
+
+
+            <a href="/logout"
+               class="btn btn-light btn-sm ms-2">
+
+                Logout
+
+            </a>
+
+        </div>
+
+    </div>
+
+</nav>
+
+
+
+<!-- ================= MAIN CONTAINER ================= -->
+
+<div class="container mt-5">
+
+
+    <!-- PAGE TITLE -->
+
+    <div class="mb-4">
+
+        <h2>
+            Receiver Dashboard
+        </h2>
+
+        <p class="text-muted">
+
+            Find and request available surplus food.
+
+        </p>
+
+    </div>
+
+
+
+    <!-- ================= SMART MATCHING INFO ================= -->
+
+    <div class="alert alert-success">
+
+        <strong>🤖 Smart Matching:</strong>
+
+        Food is ranked using location,
+        category, quantity availability,
+        and freshness.
+
+    </div>
+
+
+
+    <!-- ================= SEARCH CARD ================= -->
+
+    <div class="card shadow-sm mb-4">
+
+        <div class="card-body">
+
+            <h5 class="mb-3">
+
+                🔎 Find Suitable Food
+
+            </h5>
+
+
+            <form method="GET"
+                  action="/receiver/dashboard">
+
+
+                <div class="row">
+
+
+                    <!-- SEARCH -->
+
+                    <div class="col-md-3 mb-2">
+
+                        <label class="form-label">
+
+                            Search
+
+                        </label>
+
+
+                        <input
+                            type="text"
+                            name="search"
+                            class="form-control"
+                            placeholder="Food or location"
+                            value="{{ search }}">
+
+                    </div>
+
+
+
+                    <!-- LOCATION -->
+
+                    <div class="col-md-3 mb-2">
+
+                        <label class="form-label">
+
+                            Your Location
+
+                        </label>
+
+
+                        <input
+                            type="text"
+                            name="location"
+                            class="form-control"
+                            placeholder="Example: Pune"
+                            value="{{ location }}">
+
+                    </div>
+
+
+
+                    <!-- CATEGORY -->
+
+                    <div class="col-md-3 mb-2">
+
+                        <label class="form-label">
+
+                            Food Category
+
+                        </label>
+
+
+                        <select
+                            name="category"
+                            class="form-select">
+
+
+                            <option value="">
+
+                                All Categories
+
+                            </option>
+
+
+                            <option
+                                value="Cooked Food"
+                                {% if category == "Cooked Food" %}
+                                selected
+                                {% endif %}>
+
+                                Cooked Food
+
+                            </option>
+
+
+                            <option
+                                value="Rice"
+                                {% if category == "Rice" %}
+                                selected
+                                {% endif %}>
+
+                                Rice
+
+                            </option>
+
+
+                            <option
+                                value="Bread"
+                                {% if category == "Bread" %}
+                                selected
+                                {% endif %}>
+
+                                Bread
+
+                            </option>
+
+
+                            <option
+                                value="Vegetables"
+                                {% if category == "Vegetables" %}
+                                selected
+                                {% endif %}>
+
+                                Vegetables
+
+                            </option>
+
+
+                            <option
+                                value="Fruits"
+                                {% if category == "Fruits" %}
+                                selected
+                                {% endif %}>
+
+                                Fruits
+
+                            </option>
+
+
+                            <option
+                                value="Packaged Food"
+                                {% if category == "Packaged Food" %}
+                                selected
+                                {% endif %}>
+
+                                Packaged Food
+
+                            </option>
+
+
+                        </select>
+
+                    </div>
+
+
+
+                    <!-- QUANTITY -->
+
+                    <div class="col-md-2 mb-2">
+
+                        <label class="form-label">
+
+                            Quantity
+
+                        </label>
+
+
+                        <input
+                            type="number"
+                            name="quantity"
+                            class="form-control"
+                            min="1"
+                            value="{{ quantity }}">
+
+                    </div>
+
+
+
+                    <!-- SEARCH BUTTON -->
+
+                    <div class="col-md-1 mb-2 d-flex align-items-end">
+
+                        <button
+                            type="submit"
+                            class="btn btn-success w-100">
+
+                            🔍
+
+                        </button>
+
+                    </div>
+
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ================= FOOD LIST ================= -->
+
+    <div class="row">
+
+
+        {% if matched_foods %}
+
+
+            {% for item in matched_foods %}
+
+            {% set food = item.food %}
+
+
+            <!-- FOOD CARD -->
+
+            <div class="col-md-4 mb-4">
+
+
+                <div class="card shadow-sm h-100">
+
+
+                    <div class="card-body">
+
+
+                        <!-- ================= MATCH SCORE ================= -->
+
+                        {% if item.score >= 80 %}
+
+                            <span class="badge bg-success mb-2">
+
+                                ⭐ Excellent Match -
+                                {{ item.score }}%
+
+                            </span>
+
+                        {% elif item.score >= 50 %}
+
+                            <span class="badge bg-warning text-dark mb-2">
+
+                                👍 Good Match -
+                                {{ item.score }}%
+
+                            </span>
+
+                        {% else %}
+
+                            <span class="badge bg-secondary mb-2">
+
+                                {{ item.score }}% Match
+
+                            </span>
+
+                        {% endif %}
+
+
+
+                        <!-- ================= CATEGORY ================= -->
+
+                        <div class="mb-2">
+
+                            <span class="badge bg-success">
+
+                                {{ food.category }}
+
+                            </span>
+
+                        </div>
+
+
+
+                        <!-- ================= FOOD NAME ================= -->
+
+                        <h4>
+
+                            {{ food.food_name }}
+
+                        </h4>
+
+
+
+                        <!-- ================= DESCRIPTION ================= -->
+
+                        <p class="text-muted">
+
+                            {% if food.description %}
+
+                                {{ food.description }}
+
+                            {% else %}
+
+                                No description provided.
+
+                            {% endif %}
+
+                        </p>
+
+
+                        <hr>
+
+
+
+                        <!-- ================= QUANTITY ================= -->
+
+                        <p>
+
+                            <strong>
+                                Quantity:
+                            </strong>
+
+                            {{ food.quantity }}
+
+                            portions
+
+                        </p>
+
+
+
+                        <!-- ================= LOCATION ================= -->
+
+                        <p>
+
+                            <strong>
+                                Location:
+                            </strong>
+
+                            {{ food.location }}
+
+                        </p>
+
+
+
+                        <!-- ================= AVAILABLE UNTIL ================= -->
+
+                        <p>
+
+                            <strong>
+                                Available Until:
+                            </strong>
+
+                            {{ food.available_until }}
+
+                        </p>
+
+
+
+                        <!-- ================= FOOD STATUS ================= -->
+
+                        <p>
+
+                            <strong>
+                                Food Status:
+                            </strong>
+
+
+                            {% if food.status == "Available" %}
+
+                                <span class="badge bg-success">
+
+                                    Available
+
+                                </span>
+
+
+                            {% elif food.status == "Pending" %}
+
+                                <span class="badge bg-warning text-dark">
+
+                                    Pending
+
+                                </span>
+
+
+                            {% elif food.status == "Approved" %}
+
+                                <span class="badge bg-success">
+
+                                    Approved
+
+                                </span>
+
+
+                            {% elif food.status == "Rejected" %}
+
+                                <span class="badge bg-danger">
+
+                                    Rejected
+
+                                </span>
+
+
+                            {% else %}
+
+                                <span class="badge bg-secondary">
+
+                                    {{ food.status }}
+
+                                </span>
+
+                            {% endif %}
+
+
+                        </p>
+
+
+
+                        <!-- ================= REQUEST BUTTON ================= -->
+
+                        {% if food.status == "Available" %}
+
+                            <a
+                                href="/receiver/request/{{ food.id }}"
+                                class="btn btn-success w-100">
+
+                                📩 Request Food
+
+                            </a>
+
+                        {% else %}
+
+                            <button
+                                class="btn btn-secondary w-100"
+                                disabled>
+
+                                Request Not Available
+
+                            </button>
+
+                        {% endif %}
+
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            {% endfor %}
+
+
+        {% else %}
+
+
+            <!-- ================= NO FOOD ================= -->
+
+            <div class="col-12">
+
+                <div class="alert alert-info text-center">
+
+                    🍽️ No matching food found.
+
+                </div>
+
+            </div>
+
+
+        {% endif %}
+
+
+    </div>
+
+
+</div>
+
+
+
+<!-- ================= FOOTER ================= -->
+
+<footer class="bg-dark text-white text-center p-3 mt-5">
+
+    <p class="mb-0">
+
+        © 2026 FoodShare -
+        Food Waste Redistribution System
+
+    </p>
+
+</footer>
+
+
+
+<!-- Bootstrap JavaScript -->
+
+<script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+</script>
+
+
+</body>
+
+</html>

@@ -1,0 +1,104 @@
+
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f8f6;
+}
+
+
+/* Navbar */
+
+.navbar-brand {
+    font-size: 22px;
+}
+
+
+/* Hero section */
+
+.hero {
+    padding: 90px 20px;
+    background: linear-gradient(
+        135deg,
+        #198754,
+        #0f5132
+    );
+    color: white;
+}
+
+
+.hero h1 {
+    font-size: 48px;
+    font-weight: bold;
+}
+
+
+.hero p {
+    font-size: 20px;
+}
+
+
+/* Cards */
+
+.card {
+    border-radius: 12px;
+    border: none;
+}
+
+
+.card:hover {
+    transform: translateY(-3px);
+    transition: 0.2s;
+}
+
+
+/* Buttons */
+
+.btn {
+    border-radius: 8px;
+}
+
+
+/* Statistics */
+
+.stat-card {
+    border-left: 5px solid #198754;
+}
+
+
+/* Food cards */
+
+.food-card {
+    height: 100%;
+}
+
+
+/* Footer */
+
+.footer {
+    margin-top: 70px;
+    padding: 25px;
+    background: #212529;
+    color: white;
+    text-align: center;
+}
+
+
+/* Mobile */
+
+@media (max-width: 768px) {
+
+    .hero {
+        padding: 60px 20px;
+    }
+
+
+    .hero h1 {
+        font-size: 34px;
+    }
+
+
+    .hero p {
+        font-size: 17px;
+    }
+
+}
